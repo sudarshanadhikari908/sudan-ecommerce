@@ -1,9 +1,13 @@
 const express = require('express')
 require('dotenv/config')
 const morgan = require('morgan')
+const cors = require('cors')
 
 const dbConnect = require('./config/dbConnect')
+const categoryRoute = require('./router/category/category')
+const orderRoute = require('./router/order/order')
 const productRoute = require('./router/product/productRoute')
+const userRoute = require('./router/user/user')
 
 const api = process.env.API_URL
 
@@ -13,25 +17,18 @@ const app = express()
 // Database Connection
 dbConnect()
 
+// Use cors
+app.use(cors())
+app.options('*', cors())
+
 app.use(express.json())
 app.use(morgan('tiny'))
 
 // income route
 
 app.use(`${api}/product`, productRoute)
-
-app.get('/', (req, res) => {
-  const products = {
-    id: 2,
-    name: 'aalu',
-    image: 'kaale',
-  }
-  res.send(products).status(200)
-})
-
-app.post('/', (req, res) => {
-  const product = req.body
-  res.send(product)
-})
+app.use(`${api}/user`, userRoute)
+app.use(`${api}/category`, categoryRoute)
+app.use(`${api}/order`, orderRoute)
 
 module.exports = app
