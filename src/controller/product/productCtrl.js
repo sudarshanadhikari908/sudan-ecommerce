@@ -30,4 +30,57 @@ const getProductCtrl = expressAsyncHandler(async (req, res) => {
   }
 })
 
-module.exports = { createProductCtrl, getProductCtrl }
+const fetchProductDetailsCtrl = expressAsyncHandler(async (req, res) => {
+  const { id } = req?.params
+  try {
+    const product = await Product.findById(id)
+    res.json(product)
+  } catch (error) {
+    res.json(error)
+  }
+})
+
+// update
+const updateProductCtrl = expressAsyncHandler(async (req, res) => {
+  const { id } = req?.params
+  const { name, image, description, price, color, countInStock, size } =
+    req.body
+  try {
+    const product = await Product.findByIdAndUpdate(
+      id,
+      {
+        name,
+        image,
+        description,
+        price,
+        color,
+        countInStock,
+        size,
+      },
+      { new: true }
+    )
+    res.json(product)
+  } catch (error) {
+    res.json(error)
+  }
+})
+
+// delete single income
+
+const deleteProductCtrl = expressAsyncHandler(async (req, res) => {
+  const { id } = req?.params
+  try {
+    const product = await Product.findByIdAndDelete(id)
+    res.json(product)
+  } catch (error) {
+    res.json(error)
+  }
+})
+
+module.exports = {
+  createProductCtrl,
+  getProductCtrl,
+  fetchProductDetailsCtrl,
+  updateProductCtrl,
+  deleteProductCtrl,
+}
