@@ -7,7 +7,7 @@ const dbConnect = require('./config/dbConnect')
 const categoryRoute = require('./router/category/category')
 const orderRoute = require('./router/order/order')
 const productRoute = require('./router/product/productRoute')
-const userRoute = require('./router/user/user')
+const userRoute = require('./router/user/userRoute')
 
 const api = process.env.API_URL
 
