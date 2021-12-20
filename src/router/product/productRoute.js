@@ -7,13 +7,14 @@ const {
   updateProductCtrl,
   deleteProductCtrl,
 } = require('../../controller/product/productCtrl')
+const authMiddleware = require('../../middleware/authMiddleware')
 
 const productRoute = express.Router()
 
-productRoute.post('/', createProductCtrl)
-productRoute.get('/', getProductCtrl)
-productRoute.get('/:id', fetchProductDetailsCtrl)
-productRoute.put('/:id', updateProductCtrl)
-productRoute.delete('/:id', deleteProductCtrl)
+productRoute.post('/', authMiddleware, createProductCtrl)
+productRoute.get('/', authMiddleware, getProductCtrl)
+productRoute.get('/:id', authMiddleware, fetchProductDetailsCtrl)
+productRoute.put('/:id', authMiddleware, updateProductCtrl)
+productRoute.delete('/:id', authMiddleware, deleteProductCtrl)
 
 module.exports = productRoute

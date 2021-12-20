@@ -2,20 +2,27 @@ const expressAsyncHandler = require('express-async-handler')
 const Product = require('../../models/product')
 
 const createProductCtrl = expressAsyncHandler(async (req, res) => {
-  console.log(req)
+  if (!req?.user) {
+    throw new Error('Login first')
+  }
   const { name, image, description, price, color, countInStock, size } =
     req.body
   try {
-    const product = await Product.create({
-      name,
-      image,
-      description,
-      price,
-      color,
-      countInStock,
-      size,
-    })
-    res.json(product)
+    if (req?.user.isAdmin) {
+      const product = await Product.create({
+        user: req?.user?._id,
+        name,
+        image,
+        description,
+        price,
+        color,
+        countInStock,
+        size,
+      })
+      res.json(product)
+    } else {
+      res.send('You are not an admin')
+    }
   } catch (error) {
     res.json(error)
   }

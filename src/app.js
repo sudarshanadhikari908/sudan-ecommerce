@@ -4,7 +4,7 @@ const morgan = require('morgan')
 const cors = require('cors')
 
 const dbConnect = require('./config/dbConnect')
-const categoryRoute = require('./router/category/category')
+const categoryRoute = require('./router/category/categoryRoute')
 const orderRoute = require('./router/order/order')
 const productRoute = require('./router/product/productRoute')
 const userRoute = require('./router/user/userRoute')
