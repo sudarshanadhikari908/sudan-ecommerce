@@ -50,24 +50,31 @@ const fetchProductDetailsCtrl = expressAsyncHandler(async (req, res) => {
 
 // update
 const updateProductCtrl = expressAsyncHandler(async (req, res) => {
+  if (!req?.user) {
+    throw new Error('Login first')
+  }
   const { id } = req?.params
   const { name, image, description, price, color, countInStock, size } =
     req.body
   try {
-    const product = await Product.findByIdAndUpdate(
-      id,
-      {
-        name,
-        image,
-        description,
-        price,
-        color,
-        countInStock,
-        size,
-      },
-      { new: true }
-    )
-    res.json(product)
+    if (req?.user.isAdmin) {
+      const product = await Product.findByIdAndUpdate(
+        id,
+        {
+          name,
+          image,
+          description,
+          price,
+          color,
+          countInStock,
+          size,
+        },
+        { new: true }
+      )
+      res.json(product)
+    } else {
+      res.send('You are not an admin')
+    }
   } catch (error) {
     res.json(error)
   }
