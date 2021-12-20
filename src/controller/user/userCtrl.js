@@ -1,4 +1,5 @@
 const expressAsyncHandler = require('express-async-handler')
+const generateToken = require('../../middleware/generateToken')
 const User = require('../../models/user')
 
 const registerUser = expressAsyncHandler(async (req, res) => {
@@ -32,42 +33,48 @@ const fetchUsersCtrl = expressAsyncHandler(async (req, res) => {
     res.json(error)
   }
 })
-// login users
-const loginUserCtrl = expressAsyncHandler(async (req, res) => {
-  const { email, password } = req && req.body
 
-  // find user in db
+//login user
+const loginUserCtrl = expressAsyncHandler(async (req, res) => {
+  const { email, password } = req?.body
+  //Find the user in db
   const userFound = await User.findOne({ email })
 
-  //  check if the user password match
+  //check if the user password match
+
   if (userFound && (await userFound?.isPasswordMatch(password))) {
     res.json({
       _id: userFound?._id,
-      name: userFound?.name,
-      password: userFound?.password,
+      firstname: userFound?.firstname,
+      lastname: userFound?.lastname,
       email: userFound?.email,
       isAdmin: userFound?.isAdmin,
-      phone: userFound?.phone,
-      address: userFound?.address,
+      token: generateToken(userFound?._id),
     })
   } else {
     res.status(401)
-    throw new Error('Invalid login credentials')
+    throw new Error('Invalid Login credentials')
   }
 })
-//user profile
+
+// update user
 const updateUserCtrl = expressAsyncHandler(async (req, res) => {
-  const { id } = req?.params
   try {
     const profile = await User.findByIdAndUpdate(
-      id,
+      req?.user?._id,
+      // name,
+      // email,
+      // password,
+      // phone,
+      // address,
+      // isAdmin,
       {
-        name: userFound?.name,
-        password: userFound?.password,
-        email: userFound?.email,
-        isAdmin: userFound?.isAdmin,
-        phone: userFound?.phone,
-        address: userFound?.address,
+        name: req?.body?.name,
+        email: req?.body?.email,
+        password: req?.body?.password,
+        phone: req?.body?.phone,
+        address: req?.body?.address,
+        isAdmin: req?.body?.isAdmin,
       },
       {
         new: true,
@@ -79,5 +86,4 @@ const updateUserCtrl = expressAsyncHandler(async (req, res) => {
     res.json(error)
   }
 })
-
 module.exports = { registerUser, fetchUsersCtrl, loginUserCtrl, updateUserCtrl }
