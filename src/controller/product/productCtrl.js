@@ -2,6 +2,7 @@ const expressAsyncHandler = require('express-async-handler')
 const Product = require('../../models/product')
 
 const createProductCtrl = expressAsyncHandler(async (req, res) => {
+  console.log(req)
   const { name, image, description, price, color, countInStock, size } =
     req.body
   try {
