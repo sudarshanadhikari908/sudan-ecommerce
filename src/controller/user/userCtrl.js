@@ -62,12 +62,7 @@ const updateUserCtrl = expressAsyncHandler(async (req, res) => {
   try {
     const profile = await User.findByIdAndUpdate(
       req?.user?._id,
-      // name,
-      // email,
-      // password,
-      // phone,
-      // address,
-      // isAdmin,
+
       {
         name: req?.body?.name,
         email: req?.body?.email,
@@ -81,6 +76,7 @@ const updateUserCtrl = expressAsyncHandler(async (req, res) => {
         runValidators: true,
       }
     )
+
     res.json(profile)
   } catch (error) {
     res.json(error)

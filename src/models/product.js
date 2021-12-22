@@ -31,7 +31,7 @@ const productSchema = mongoose.Schema(
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Category',
-      // required: true,
+      required: true,
     },
     color: {
       type: String,
@@ -50,6 +50,10 @@ const productSchema = mongoose.Schema(
       type: Number,
       default: 0,
     },
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
     size: {
       required: true,
       type: Number,
@@ -59,6 +63,14 @@ const productSchema = mongoose.Schema(
     timestamps: true,
   }
 )
+
+productSchema.virtual('id').get(function () {
+  return this._id.toHexString()
+})
+
+productSchema.set('toJSON', {
+  virtuals: true,
+})
 
 const Product = mongoose.model('Product', productSchema)
 module.exports = Product

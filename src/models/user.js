@@ -51,10 +51,27 @@ userSchema.pre('save', async function (next) {
   next()
 })
 
+userSchema.pre('modify', async function (next) {
+  if (!this.isModified('password')) {
+    next()
+  }
+  const salt = await bcrypt.genSalt(10)
+  this.password = await bcrypt.hash(this.password, salt)
+  next()
+})
+
 //Verify password
 userSchema.methods.isPasswordMatch = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password)
 }
+
+userSchema.virtual('id').get(function () {
+  return this._id.toHexString()
+})
+
+userSchema.set('toJSON', {
+  virtuals: true,
+})
 
 const User = mongoose.model('User', userSchema)
 module.exports = User

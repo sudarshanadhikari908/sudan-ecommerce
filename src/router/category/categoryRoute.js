@@ -6,13 +6,14 @@ const {
   updateCategoryCtrl,
   deleteCategoryCtrl,
 } = require('../../controller/category/categoryCtrl')
+const authMiddleware = require('../../middleware/authMiddleware')
 
 const categoryRoute = express.Router()
 
-categoryRoute.post('/', createCategoryCtrl)
+categoryRoute.post('/', authMiddleware, createCategoryCtrl)
 categoryRoute.get('/', getCategoryCtrl)
 categoryRoute.get('/:id', fetchCategoryDetailsCtrl)
-categoryRoute.put('/:id', updateCategoryCtrl)
-categoryRoute.delete('/:id', deleteCategoryCtrl)
+categoryRoute.put('/:id', authMiddleware, updateCategoryCtrl)
+categoryRoute.delete('/:id', authMiddleware, deleteCategoryCtrl)
 
 module.exports = categoryRoute

@@ -1,14 +1,20 @@
 const expressAsyncHandler = require('express-async-handler')
+const Category = require('../../models/category')
 const Product = require('../../models/product')
+const mongoose = require('mongoose')
 
 const createProductCtrl = expressAsyncHandler(async (req, res) => {
   if (!req?.user) {
     throw new Error('Login first')
   }
+
   const { name, image, description, price, color, countInStock, size } =
     req.body
   try {
     if (req?.user.isAdmin) {
+      const category = await Category.findById(req.body.category)
+
+      if (!category) throw new Error('Invalid category')
       const product = await Product.create({
         user: req?.user?._id,
         name,
@@ -18,6 +24,7 @@ const createProductCtrl = expressAsyncHandler(async (req, res) => {
         color,
         countInStock,
         size,
+        category,
       })
       res.json(product)
     } else {
@@ -30,7 +37,11 @@ const createProductCtrl = expressAsyncHandler(async (req, res) => {
 
 const getProductCtrl = expressAsyncHandler(async (req, res) => {
   try {
-    const products = await Product.find()
+    let filter = {}
+    if (req.query.categories) {
+      filter = { category: req.query.categories.split(',') }
+    }
+    const products = await Product.find(filter).populate('category')
 
     res.send(products).status(200)
   } catch (e) {
@@ -38,10 +49,31 @@ const getProductCtrl = expressAsyncHandler(async (req, res) => {
   }
 })
 
+const productCountCtrl = expressAsyncHandler(async (req, res) => {
+  if (!req?.user) {
+    throw new Error('Login first')
+  }
+  try {
+    if (req?.user.isAdmin) {
+      const productCount = await Product.countDocuments((count) => count)
+      if (!productCount) {
+        throw new Error('Something went wrong')
+      }
+      res.send(productCount)
+    } else {
+      throw new Error('You are not admin')
+    }
+  } catch (e) {
+    res.send(e).status(500)
+  }
+})
+
+const featuredProductCtrl = expressAsyncHandler(async (req, res) => {})
+
 const fetchProductDetailsCtrl = expressAsyncHandler(async (req, res) => {
   const { id } = req?.params
   try {
-    const product = await Product.findById(id)
+    const product = await Product.findById(id).populate('category')
     res.json(product)
   } catch (error) {
     res.json(error)
@@ -58,6 +90,9 @@ const updateProductCtrl = expressAsyncHandler(async (req, res) => {
     req.body
   try {
     if (req?.user.isAdmin) {
+      const category = await Category.findById(req.body.category)
+
+      if (!category) throw new Error('Invalid category')
       const product = await Product.findByIdAndUpdate(
         id,
         {
@@ -68,6 +103,7 @@ const updateProductCtrl = expressAsyncHandler(async (req, res) => {
           color,
           countInStock,
           size,
+          category,
         },
         { new: true }
       )
@@ -95,6 +131,7 @@ const deleteProductCtrl = expressAsyncHandler(async (req, res) => {
 module.exports = {
   createProductCtrl,
   getProductCtrl,
+  productCountCtrl,
   fetchProductDetailsCtrl,
   updateProductCtrl,
   deleteProductCtrl,
